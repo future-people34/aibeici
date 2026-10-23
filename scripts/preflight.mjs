@@ -4,6 +4,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 const SKIP_DIRS = new Set([
   'node_modules',
@@ -74,8 +75,24 @@ for (const [f, s] of big.sort((a, b) => b[1] - a[1])) {
   console.log(`  ${(s / 1024 / 1024).toFixed(2)} MB  ${f}`);
 }
 
-console.log(`\n密钥泄露检查：${hits.length ? '✗ 命中 ' + hits.length + ' 个文件' : '✓ 没有命中'}`);
-for (const h of hits) console.log('  ⚠ ' + h);
+// 命中的文件如果已经被 .gitignore 排除，就不算泄露
+function isIgnored(file) {
+  try {
+    execFileSync('git', ['check-ignore', '-q', file], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const dangerous = hits.filter((h) => !isIgnored(h));
+const safe = hits.filter((h) => isIgnored(h));
+
+console.log(
+  `\n密钥泄露检查：${dangerous.length ? '✗ 有 ' + dangerous.length + ' 个会被提交的文件含密钥' : '✓ 不会被提交的文件里没有密钥'}`,
+);
+for (const d of dangerous) console.log('  ⚠ 必须移除：' + d);
+for (const s of safe) console.log(`  · ${s}（已被 .gitignore 排除，不会上传）`);
 
 const byExt = new Map();
 for (const f of files) {

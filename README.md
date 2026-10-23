@@ -74,11 +74,19 @@ Windows 上还有两个双击即用的入口：
 
 Key 在 <https://platform.deepseek.com/api_keys> 创建。界面里也能换模型（任何 OpenAI 兼容接口都行）。
 
+<p align="left">
+  <img src="docs/screenshots/06-firstrun.png" width="260" alt="首次启动的密钥引导" />
+</p>
+
 ## 每天怎么用
 
 1. 首页显示今天的任务：新词 N 个 + 复习 M 个（计划当天只生成一次，刷新不会变）。
 2. 点「开始学习」，逐个看英文写中文；实在想不起来点「不认识」看提示，提示用完才是答案。
 3. 学完点「去读今天的文章」，做 5 道题，交卷后看生词表和全文翻译。
+
+<p align="center">
+  <img src="docs/screenshots/04-reading.png" width="260" alt="生成的阅读理解" />
+</p>
 
 复习量太大时系统会自动下调新词量（待复习 ≥ 上限 → 降到 1/3；> 80% → 减半；最近 3 天正确率 < 65% → 再打六折）。
 
