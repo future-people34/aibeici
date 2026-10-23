@@ -1,0 +1,38 @@
+{
+  "name": "aibeici",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "爱背词 —— 本地优先的 CET-6 智能背单词 PWA",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "serve": "node scripts/serve.mjs",
+    "launch": "node scripts/launch.mjs",
+    "start": "npm run build && node scripts/serve.mjs",
+    "build:dict": "node scripts/build-dict.mjs",
+    "fetch:data": "node scripts/fetch-data.mjs",
+    "enrich:defs": "node scripts/enrich-defs.mjs",
+    "enrich:hints": "node scripts/enrich-hints.mjs",
+    "android:sdk": "node scripts/fetch-sdk.mjs",
+    "android:apk": "node scripts/build-apk.mjs",
+    "test": "node scripts/test.mjs"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "ts-fsrs": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "4.3.4",
+    "esbuild": "0.21.3",
+    "typescript": "5.6.3",
+    "vite": "5.4.11"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}

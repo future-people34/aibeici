@@ -1,0 +1,7 @@
+packages:
+  - '.'
+
+nodeLinker: hoisted
+
+allowBuilds:
+  esbuild: false

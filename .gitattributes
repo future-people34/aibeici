@@ -1,0 +1,18 @@
+# 统一换行符，避免 Windows 提交的东西在别的平台变样
+* text=auto eol=lf
+
+# Windows 批处理必须保留 CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# 二进制
+*.png binary
+*.jpg binary
+*.ico binary
+*.apk binary
+*.keystore binary
+*.jar binary
+*.woff2 binary
+
+# 词库是大 JSON，别在 diff 里逐行比较
+public/data/words.json -diff linguist-generated

@@ -1,0 +1,27 @@
+node_modules/
+dist/
+.pnpm-store/
+.pnpm-cache/
+.npm-cache/
+
+# 原始词库数据（用 npm run fetch:data 重新下载，约 90 MB）
+data/raw/*
+data/tmp/
+# 但这两个是花过模型调用才生成的，提交上去，别人重建词库就不用再花钱
+!data/raw/en-defs.json
+!data/raw/zh-hints.json
+
+# 安卓打包产物与本地工具链
+android-sdk/
+android/build/
+android/aibeici.keystore
+dist-android/
+
+# 本地密钥（永远不要提交）
+.env.local
+apikey.txt
+
+# 系统
+.DS_Store
+Thumbs.db
+*.log
