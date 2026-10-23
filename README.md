@@ -23,7 +23,7 @@
 - **看英文写中文，模型判语义**：判「对 / 部分正确 / 错」，给出命中的义项、点评和记忆提示。
 - **词性必须对得上**：`environmental` 答「环境」判**部分正确**（那是名词 `environment` 的意思），
   应写成「环境的」。词库里 94 个词带这种「易混词根」标记。
-- **提示是中文阶梯**：构词（`environment + -al`）→ 中文例句挖空（`化学工业对______造成的破坏`）→
+- **提示是中文阶梯**：构词（`environment + -al`）→（有例句时）中文例句挖空（`化学工业对______造成的破坏`）→
   中文词义提示（`和周围自然条件有关的`）→ 答案。刻意不给首字母、字母数、音节数这种屏幕上已有的信息。
 - **FSRS 复习调度**：每次作答更新记忆强度，间隔按目标保持率反算（10 分钟 → 4 天 → 14 天 → 44 天）。
   答错的词当天隔几个词重考一次；反复答错的词会被强行压短间隔。
@@ -98,7 +98,7 @@ Key 在 <https://platform.deepseek.com/api_keys> 创建。界面里也能换模�
 | L2 本地拦截 | 猜测口吻（「好像」「是不是」）、单字、长句 → 交 L3 | 0 | 0 |
 | L3 大模型 | L1 没命中的模糊表述 | ≈¥0.002/次 | ~1s |
 
-实测 L1 覆盖 **97.3%** 的正确作答；拿别的词的答案来答，**100%** 会被拦下转给模型。
+实测 L1 覆盖 **97.3%** 的正确作答；拿别的词的答案来答，**99.8%** 会被拦下转给模型（400 次抽样的结果）。
 L3 结果按「词 + 归一化答案」缓存，同一个答案只问一次。
 
 ## 复习怎么排（遗忘曲线）
@@ -127,27 +127,28 @@ L3 结果按「词 + 归一化答案」缓存，同一个答案只问一次。
 
 ## 词库
 
-5269 个六级词，其中 **1923 个六级增量词**（排除四级基础词），3346 个与四级重叠。
-按词频排序，先学最常用的；每个词带音标、义项、例句、变形、可接受答案键、中文词义提示。
+5336 个六级词，其中 **1923 个六级增量词**（排除四级基础词），3413 个与四级重叠。
+按词频排序，先学最常用的；每个词带音标、义项、变形、可接受答案键、中文词义提示。
 
 | 数据 | 来源 | 许可 |
 |---|---|---|
-| 词条、音标、中英释义、词频、词形变化 | [ECDICT](https://github.com/skywind3000/ECDICT) | MIT |
-| 双语例句、同义词 | [KyleBing/dict](https://github.com/KyleBing/dict) | ⚠️ 未声明，见 [NOTICE.md](NOTICE.md) |
-| 四六级词表 | [KyleBing/english-vocabulary](https://github.com/KyleBing/english-vocabulary) | BSD-3-Clause |
-| 词频 | [FrequencyWords](https://github.com/hermitdave/FrequencyWords) | MIT |
-| 补充英文释义（1503 条）、中文词义提示（5268 条） | 本项目用模型生成 | MIT |
+| 词条、音标、中英释义、词频、词形变化 | [ECDICT](https://github.com/skywind3000/ECDICT) | MIT ✅ |
+| 四六级词表（区分增量词用） | [KyleBing/english-vocabulary](https://github.com/KyleBing/english-vocabulary) | BSD-3-Clause ✅ |
+| 词频 | [FrequencyWords](https://github.com/hermitdave/FrequencyWords) | MIT ✅ |
+| 补充英文释义（1503 条）、中文词义提示（5268 条） | 本项目用模型生成 | MIT ✅ |
+| ~~双语例句、同义词~~ | ~~[KyleBing/dict](https://github.com/KyleBing/dict)~~ | 该仓库**未声明许可证**，因此**未包含**在词库里，见 [NOTICE.md](NOTICE.md) |
 
 重新构建词库（需要先下载原始数据，约 90 MB）：
 
 ```bash
-npm run fetch:data      # 下载 ECDICT 与词书
-npm run enrich:defs     # 可选：用模型补英文释义（需要 Key）
-npm run enrich:hints    # 可选：用模型生成中文词义提示（需要 Key）
-npm run build:dict      # 生成 public/data/words.json
+npm run fetch:data      # 下载 ECDICT 与词表（约 90 MB）
+npm run build:dict      # 生成 public/data/words.json（默认不含例句，许可明确）
 ```
 
-只想用许可明确的数据：`node scripts/build-dict.mjs --no-rich`（会失去例句与同义词）。
+`enrich:defs` / `enrich:hints` 是当初用模型补数据的脚本，结果已经提交在 `data/raw/`，
+所以正常重建**不需要**再调模型、也不用花 Key。
+
+想要例句与同义词：`node scripts/build-dict.mjs --rich` —— 那部分来自一个未声明许可证的仓库，请先确认授权。
 
 ## 技术架构
 
@@ -199,12 +200,14 @@ npm test     # 判分规则、FSRS 调度、阅读校验、选项打乱、提示
 
 ## 许可
 
-代码 [MIT](LICENSE)。词库数据的授权情况**各不相同**，务必先读 [NOTICE.md](NOTICE.md) —— 其中
-例句与同义词来自一个未声明许可证的仓库，公开分发前建议处理。
+代码 [MIT](LICENSE)。词库数据逐字段的出处见 [NOTICE.md](NOTICE.md)：随仓库提交的词库
+**只用许可明确的来源**（ECDICT / FrequencyWords / BSD-3 的词表）+ 本项目用模型生成的释义与提示，
+不含那个未声明许可证仓库的例句数据。
 
 ## 致谢
 
 - [ECDICT](https://github.com/skywind3000/ECDICT) —— 英汉词典数据基础
 - [ts-fsrs](https://github.com/open-spaced-repetition/ts-fsrs) —— FSRS 调度实现
-- [KyleBing](https://github.com/KyleBing) 的词书仓库 —— 例句与词表
+- [FrequencyWords](https://github.com/hermitdave/FrequencyWords) —— 词频
+- [KyleBing/english-vocabulary](https://github.com/KyleBing/english-vocabulary) —— 四六级词表
 - [FrequencyWords](https://github.com/hermitdave/FrequencyWords) —— 词频

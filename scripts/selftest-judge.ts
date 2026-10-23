@@ -47,9 +47,20 @@ check('abandon', '放纵', true, '第二个义项');
 check('abandon', '放弃一切', true, '长一点的表述');
 check('ambiguous', '模棱两可', true);
 check('deteriorate', '恶化', true);
-check('comply', '遵守', true, '同义词');
-check('comply', '遵从', true);
 check('sophisticated', '复杂的', true);
+
+// 同义词这几条依赖词书数据：合规模式（默认）下没有，交给模型也算正确行为
+function checkEither(w: string, input: string, allowed: Array<'correct' | 'null'>, note = '') {
+  const res = ruleJudge(get(w), input);
+  const got = res ? res.verdict : 'null';
+  const ok = allowed.includes(got as 'correct' | 'null');
+  if (!ok) fails++;
+  console.log(
+    `[${ok ? 'PASS' : 'FAIL'}] ${w.padEnd(14)} "${input}" -> ${got}${note ? `  // ${note}` : ''}`,
+  );
+}
+checkEither('comply', '遵守', ['correct', 'null'], '同义词，有词书数据时本地判对，否则交模型');
+checkEither('comply', '遵从', ['correct', 'null'], '同上');
 
 console.log('\n=== 应当交给模型 ===');
 check('ambiguous', '含糊不清', false, '词库未收录的表述');
@@ -105,16 +116,28 @@ function checkHint(w: string, level: number, mustHave: string[], mustNot: string
   if (bad.length) console.log(`        不该出现：${bad.join('、')}`);
 }
 
-const noEnglish = ['英文释义', '音节', '首字母'];
-checkHint('environmental', 1, ['形容词', '构词', 'environment'], noEnglish);
-checkHint('environmental', 2, ['中文例句', '______'], [...noEnglish, '英文例句']);
-checkHint('environmental', 3, ['词义'], noEnglish);
-checkHint('deteriorate', 1, ['中文例句', '______'], noEnglish);
-checkHint('deteriorate', 2, ['词义'], [...noEnglish, '恶化']);
+const noJunk = ['英文释义', '音节', '首字母'];
+const realHint = ['构词', '中文例句', '词义'];
 
+// 一级提示必须有真内容（不能只是词性），并且不能出现屏幕上已有的信息
+checkHint('environmental', 1, ['形容词', '构词'], noJunk);
+// 最后一级应该是中文词义提示（合规模式没有例句时，它就是第一级）
 const envCount = hintCount(get('environmental'));
-console.log(`[${envCount >= 2 ? 'PASS' : 'FAIL'}] environmental 有 ${envCount} 级可用提示`);
-if (envCount < 2) fails++;
+checkHint('environmental', envCount, ['词义'], noJunk);
+checkHint('deteriorate', 1, ['词义'], noJunk);
+
+function assertHasRealHint(w: string) {
+  const text = hintFor(get(w), 1);
+  const ok = realHint.some((k) => text.includes(k));
+  if (!ok) fails++;
+  console.log(`[${ok ? 'PASS' : 'FAIL'}] ${w} 一级提示有实质内容：${text.replace(/\n/g, ' / ')}`);
+}
+assertHasRealHint('environmental');
+assertHasRealHint('deteriorate');
+assertHasRealHint('attorney');
+
+console.log(`[${envCount >= 1 ? 'PASS' : 'FAIL'}] environmental 有 ${envCount} 级可用提示`);
+if (envCount < 1) fails++;
 
 console.log('\n=== 全库：没有提示可用的词有多少 ===');
 let zero = 0;

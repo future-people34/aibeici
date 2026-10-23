@@ -209,11 +209,18 @@ console.error(`中文词义提示：${Object.keys(ZH_HINTS).length} 条`);
 /** ------------------ 2. 词书例句/同义词 ------------------ */
 
 const richMap = new Map();
-/** --no-rich：不使用 KyleBing 词书（它没有声明许可证），只保留 ECDICT + 模型生成的内容 */
-const NO_RICH = process.argv.includes('--no-rich');
-if (NO_RICH) console.error('--no-rich：跳过词书例句/同义词，只用 ECDICT + 模型生成内容');
+/**
+ * 默认**不**使用 KyleBing 词书 —— 那个仓库没有声明许可证，它的例句/同义词不宜再分发。
+ * 加 --rich 才会把例句与同义词并进词库（自行确认授权后再这么做）。
+ */
+const RICH = process.argv.includes('--rich');
+if (RICH) {
+  console.error('--rich：把 KyleBing 词书的例句/同义词并入词库（请自行确认授权）');
+} else {
+  console.error('默认合规模式：只用 ECDICT + 模型生成内容，不含词书例句/同义词（加 --rich 才包含）');
+}
 
-for (const file of NO_RICH ? [] : ['CET6_1', 'CET6_2', 'CET6_3']) {
+for (const file of RICH ? ['CET6_1', 'CET6_2', 'CET6_3'] : []) {
   const p = path.join(RAW, `${file}.jsonl`);
   if (!fs.existsSync(p)) continue;
   for (const line of fs.readFileSync(p, 'utf8').split(/\r?\n/)) {
@@ -337,9 +344,9 @@ for (const [key, e] of ecdict) {
   // 丢弃专有名词（Jesus / Catholic / Egyptian 之类）
   if (/^[A-Z]/.test(e.w)) continue;
   // 丢弃屈折变体（grants / hypotheses 之类），只保留原形。
-  // 但在精选六级词书里出现过的词保留 —— 例如 sophisticated 虽然源自 sophisticate，
-  // 它本身是六级要考的形容词。
-  if (/(^|\/)0:/.test(e.exchange) && !richMap.has(key)) {
+  // 判断依据不能依赖词书数据：sophisticated 虽然源自 sophisticate，
+  // 但它本身是柯林斯/牛津收录的独立词条，必须保留。
+  if (/(^|\/)0:/.test(e.exchange) && !richMap.has(key) && !e.collins && !e.oxford) {
     dropInflected++;
     continue;
   }
