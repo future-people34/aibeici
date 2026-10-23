@@ -15,6 +15,19 @@ const RAW = 'data/raw';
 const CSV = 'data/tmp/ecdict/package/assets/ecdict.csv';
 const OUT = 'public/data/words.json';
 
+// 原始数据没有提交进仓库（约 90 MB），缺了就给一条能照着做的提示
+if (!fs.existsSync(CSV)) {
+  console.error('');
+  console.error('✗ 找不到 ECDICT 词库文件：' + CSV);
+  console.error('  词库原始数据没有随仓库提交，先下载再构建：');
+  console.error('    npm run fetch:data     # 约 90 MB，从 jsDelivr / npm 拉取');
+  console.error('    npm run build:dict');
+  console.error('');
+  console.error('  只想直接用现成词库的话，public/data/words.json 已经在仓库里，不用重新构建。');
+  console.error('');
+  process.exit(1);
+}
+
 const POS_MAP = {
   n: 'n', v: 'v', vt: 'vt', vi: 'vi', adj: 'adj', a: 'adj', adv: 'adv', ad: 'adv',
   prep: 'prep', conj: 'conj', pron: 'pron', num: 'num', art: 'art',
