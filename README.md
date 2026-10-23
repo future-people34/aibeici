@@ -1,5 +1,8 @@
 # 爱背词 · CET-6
 
+[![CI](https://github.com/future-people34/aibeici/actions/workflows/ci.yml/badge.svg)](https://github.com/future-people34/aibeici/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 **看英文，写中文 —— 让模型判断你想起来的意思对不对，再按遗忘曲线安排复习，最后用当天学的词写一篇阅读理解。**
 
 一个本地优先的六级背单词应用。词库和学习记录全在你的设备上，只有判分和生成文章时才联网调模型。
@@ -45,7 +48,7 @@ Android 7.0+，纯 Java 无 native 库，arm64 / armv7 通用。
 ### 本地跑网页版
 
 ```bash
-git clone https://github.com/<your-name>/aibeici.git
+git clone https://github.com/future-people34/aibeici.git
 cd aibeici
 npm install          # 或 pnpm install
 npm run dev          # http://127.0.0.1:5180
