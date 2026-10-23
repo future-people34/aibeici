@@ -45,7 +45,8 @@ Android 7.0+，纯 Java 无 native 库，arm64 / armv7 通用。
 ### 本地跑网页版
 
 ```bash
-git clone <this-repo> && cd aibeici
+git clone https://github.com/<your-name>/aibeici.git
+cd aibeici
 npm install          # 或 pnpm install
 npm run dev          # http://127.0.0.1:5180
 ```
