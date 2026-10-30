@@ -155,6 +155,39 @@ if (zero / dict.words.length > 0.03) {
   console.log('  PASS 空提示占比可接受');
 }
 
+console.log('\n=== 全库：每个词都要有助记（答对答错都显示）===');
+let noMnemonic = 0;
+let copyOfMeaning = 0;
+let tooLong = 0;
+for (const w of dict.words) {
+  const m = (w.mnemonic || '').trim();
+  if (!m) {
+    noMnemonic++;
+    continue;
+  }
+  if (!/[\u4e00-\u9fa5]/.test(m)) noMnemonic++;
+  if (w.senses.some((s) => s.cn && m === s.cn.trim())) copyOfMeaning++;
+  if (m.length > 90) tooLong++;
+}
+const mnemonicRate = 1 - noMnemonic / dict.words.length;
+console.log(
+  `  有助记 ${dict.words.length - noMnemonic}/${dict.words.length}（${(mnemonicRate * 100).toFixed(1)}%）｜只是抄释义 ${copyOfMeaning} 个｜过长 ${tooLong} 个`,
+);
+if (mnemonicRate < 0.95) {
+  console.log('  FAIL 助记覆盖率不足 95%');
+  fails++;
+} else {
+  console.log('  PASS 助记覆盖率达标');
+}
+if (copyOfMeaning > dict.words.length * 0.05) {
+  console.log('  FAIL 太多助记只是抄了一遍释义');
+  fails++;
+}
+if (tooLong > 0) {
+  console.log('  FAIL 有助记超过 90 字');
+  fails++;
+}
+
 console.log('\n=== 批量召回 / 误判 ===');
 const pool = dict.words.filter((w) => !w.c4).slice(0, 400);
 let recall = 0;

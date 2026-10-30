@@ -15,6 +15,7 @@
     "fetch:data": "node scripts/fetch-data.mjs",
     "enrich:defs": "node scripts/enrich-defs.mjs",
     "enrich:hints": "node scripts/enrich-hints.mjs",
+    "enrich:mnemonics": "node scripts/enrich-mnemonics.mjs",
     "android:sdk": "node scripts/fetch-sdk.mjs",
     "android:apk": "node scripts/build-apk.mjs",
     "test": "node scripts/test.mjs"

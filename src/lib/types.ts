@@ -37,6 +37,8 @@ export interface Word {
   synEn?: string[];
   /** 一句中文词义提示（模型生成，已避开标准译词），用于提示的最后一级 */
   zhHint?: string;
+  /** 中文助记（词根拆解 / 联想 / 搭配），答对答错都会显示 */
+  mnemonic?: string;
   /** 该词的常见变形，用于校验阅读文章是否包含目标词 */
   forms: string[];
   /** 本地规则判分用的可接受中文答案键 */

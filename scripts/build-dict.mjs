@@ -206,6 +206,19 @@ const ZH_HINTS = (() => {
 })();
 console.error(`中文词义提示：${Object.keys(ZH_HINTS).length} 条`);
 
+/** 模型生成的中文助记（enrich-mnemonics.mjs 产出），答对答错都显示 */
+const MNEMONICS = (() => {
+  const p = path.join(RAW, 'mnemonics.json');
+  if (!fs.existsSync(p)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch {
+    console.error('mnemonics.json 解析失败，忽略');
+    return {};
+  }
+})();
+console.error(`中文助记：${Object.keys(MNEMONICS).length} 条`);
+
 /** ------------------ 2. 词书例句/同义词 ------------------ */
 
 const richMap = new Map();
@@ -382,6 +395,7 @@ for (const [key, e] of ecdict) {
     syn: rich?.syn?.length ? rich.syn : [],
     synEn: rich?.synEn?.length ? rich.synEn : [],
     zhHint: ZH_HINTS[key] || '',
+    mnemonic: MNEMONICS[key] || '',
     forms: buildForms(key, e.exchange),
     accept: keys.slice(0, 16),
     __candidates: candidates,

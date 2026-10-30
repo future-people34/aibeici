@@ -312,9 +312,10 @@ export default function Study({ plan, settings, onAnswer, onExit, onFinish, hasR
                 <b>点评</b>　{result.reason}
               </div>
             )}
-            {result.hint && (
+            {/* 记法：优先用词库里的固定助记（每个词都有），没有才退回模型临时给的提示 */}
+            {(word.mnemonic || result.hint) && (
               <div className="reason" style={{ background: 'var(--amber-soft)' }}>
-                <b>记法</b>　{result.hint}
+                <b>记法</b>　{word.mnemonic || result.hint}
               </div>
             )}
 
